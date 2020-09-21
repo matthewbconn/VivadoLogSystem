@@ -47,6 +47,8 @@ void lognum::MAC(lognum A, lognum B) {
     (*this)=(addReals(*this,mult));
 }
 
+// Q: why are these functions defined?
+// A: for use in copy ctor
 bool lognum::getSignBit() const  {
     return signBit;
 }
@@ -55,21 +57,27 @@ double lognum::getLogval() {
     return logval.to_double();
 }
 
+/*
+ * the bitshift will be performed after
+ * d is implicitly cast to an integer
+ * using the FLOOR round scheme.
+ * Note that d >= 0 from how we call this func
+ * */
 fixedtype deltaPlus(fixedtype d) {
-    /*
-     * Certainly d can have a fractional part
-     * does Vivado round/truncate the fractional part
-     * in determining the bitshifts?
-     *
-     * i5 i4 ...i1 i0 . f0 ... f5
-     * */
     fixedtype bitshift(1);
     bitshift = (bitshift >> d);
     return bitshift;
 }
 
 fixedtype deltaMinus(fixedtype d) {
+/*  old implementation: shift then multiply
     fixedtype bitshift(1.5);
     bitshift = -1*(bitshift >> d);
-    return bitshift;
+*/
+
+// new implementation: start at -1.5, then shift
+    fixedtype bitshift(-1.5);
+    bitshift = (bitshift >> d);
+    // need to 'OR' mask to set MSB == '1' to preserve arithmetic shift
+    return (bitshift | MIN_VAL);
 }

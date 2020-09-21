@@ -29,6 +29,7 @@ void printMinMax();
 int main() {
     srand(time(NULL));
     runMSETest();
+
 /*
     printDemoCases();
     runTestsMixedNums();

@@ -10,9 +10,14 @@
 #define NBITS 1
 
 #include "ap_fixed.h"
-//#include "hls_math.h"
+#include "cmath"    // ill advised to use this
+//#include "hls_math.h" // for some reason this causes a dumb issue
 
 typedef ap_fixed<WBITS,IBITS,AP_RND_ZERO,AP_SAT,NBITS> fixedtype;
+
+// Get a mask that is "100000.000000"
+
+static fixedtype MIN_VAL = fixedtype(-1*pow(2,IBITS-1));
 
 class lognum {
 public:
