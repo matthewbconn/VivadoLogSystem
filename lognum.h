@@ -5,7 +5,7 @@
 #ifndef VIVADOLOGSYSTEM_LOGNUM_H
 #define VIVADOLOGSYSTEM_LOGNUM_H
 
-#define WBITS 12
+#define WBITS 16
 #define IBITS 6
 #define NBITS 1
 

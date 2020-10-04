@@ -7,6 +7,8 @@
 #include "ConversionEngine.cpp"
 #define TESTCASES 10000
 #define LARGEFRAC 0.1
+#define BASE 2
+// if you change BASE here still need to change "log2" ConversionEngine.cpp (lognum.h doesn't care, I think...)
 
 using namespace std;
 
@@ -33,6 +35,8 @@ void printMinMax();
 int main() {
     srand(time(NULL));
 
+    runMSETest();
+    runTestsSmallNums();
     runMSE_Delta_Test_Procedure();
 
 /*
@@ -44,7 +48,7 @@ int main() {
 
     MACdemo();
     runMSETest();
-    // deprecated runMSETestforDeltaComparison()
+    // deprecated DON'T USE runMSETestforDeltaComparison()
     printMinMax();
 */
 
@@ -61,7 +65,7 @@ string sign(bool b) {
  * Output: the corresponding real value, as an int
  * */
 int convertToInt(lognum L) {
-    double d = pow(2,L.getLogval());
+    double d = pow(BASE,L.getLogval());
     if (L.getSignBit()) {
         return d;
     }
@@ -73,7 +77,7 @@ int convertToInt(lognum L) {
  * Output: the corresponding real value, as a double
  * */
 double convertToDouble(lognum L) {
-    double d = pow(2,L.getLogval());
+    double d = pow(BASE,L.getLogval());
     if (L.getSignBit()) {
         return d;
     }
@@ -172,6 +176,8 @@ void runTestsSmallNums() {
     // Currently allotting 6 signed bits for integer
     // log2(|x|) can range from 2^-5 ( = -32)  to just below 2^5 - 1 ( = 31 - eps)
     // Corresponding x ranges from  just above 0 to just below 2^31 ~ 10^9
+
+    // These tests squeeze x into range -1 < x_real < +1
     for (int i = 0; i < TESTCASES; ++i) {
         double r1(1.0*((rand() % 1000))/1000); if (i%2) {r1 *= -1;}
         double r2(1.0*((rand() % 1000))/1000); if (i%4) {r2 *= -1;}
@@ -284,7 +290,7 @@ void runMSETest() {
     // Corresponding x ranges from  just above 0 to just below 2^31 ~ 10^9
     for (int i = 0; i < TESTCASES; ++i) {
         // get integer bases, range up to 2^15
-        int base_num = 1024*32;
+        int base_num = 1024*32; // changed for base = sqrt(2)
         int32_t r1_int((rand() % (base_num)));
         int32_t r2_int((rand() % (base_num)));
         int32_t r3_int((rand() % (base_num)));
@@ -473,15 +479,17 @@ void runMSE_Delta_Test_Procedure() {
         int base_num = 1024*32;
         int32_t r1_int((rand() % (base_num)));
 
+
+
         // 1. Pick a number |a|......OKAY to change a by adding an integer, making it negative, etc. (+=r1_int)
-        double a = (double)rand()/RAND_MAX; //a += r1_int;
+        double a = (double)rand()/RAND_MAX; //a += r1_int; leaving this part commented squeezes a_real into (-1,+1)
         // 2. Calculate A_fixed (float here)
-        double Afloat = log2(a);
+        double Afloat = log(a)/log(BASE); // log2(a);
         // 3. Calculate B_fixed (float here) by moving up to 1 away
         double eps = (double)rand()/RAND_MAX;
         double Bfloat = Afloat + eps;
         // 4. Pick a number |b|
-        double b = pow(2,Bfloat);
+        double b = pow(BASE,Bfloat);
 
         // Exercise all test cases keeping a same for both, splitting b
         double bplus(b),bminus(b);
@@ -548,9 +556,9 @@ void printMSE_Errors(int largeErrorCt,double MSE_MAC, double MSE_ACC, double MSE
     printf("\nMSE from reference ADD ops was : \t\t%.4f",(MSE_ACC));
     printf("\nMSE from the MUL ops was : \t\t\t%.4f",(MSE_MUL));
 
-    printf("\n\nRMSD on %d MAC operations: \t\t%.7f",(TESTCASES), (RMSD_MAC));
+    printf("\n\nRMSD on %d MAC operations: \t\t\t%.7f",(TESTCASES), (RMSD_MAC));
     printf("\nRMSD of ADD ops operations: \t\t\t%.7f",(RMSD_ACC));
-    printf("\nRMSD of MUL operations: \t\t\t%.7f",(RMSD_MUL));
+    printf("\nRMSD of MUL operations: \t\t\t%.7f",(RMSD_MUL));cout<<endl;
 }
 
 void printMSE_Errors_Short(int largeErrorCt, double MSE) {

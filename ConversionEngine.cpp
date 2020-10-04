@@ -13,6 +13,8 @@
 #include <cmath>
 #include "lognum.h"
 
+#define BASE 2
+
 
 // Forward Declarations Here
 
@@ -68,9 +70,12 @@ char getSignSymbol(T item) {
 template <typename T>
 // changed return type from int to double while you were tired
 double getlog2val(T item) {
+
     if (item > 0) {
-        return log2(item);
+        return log(item)/log(BASE);
+        //return log2(item);
     } else if (item < 0){
+        return log(-1*item)/log(BASE);
         return log2(-1*item);
     } else { // item == 0
         return INT16_MIN;

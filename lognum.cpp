@@ -35,13 +35,6 @@ lognum lognum::multiplyReals(lognum v1, lognum v2) {
     return lognum(! (v1.signBit xor v2.signBit), v1.logval + v2.logval);
 }
 
-/*
- * Red flag: you coded this when you were tired.
- *           that's probably why it isn't working/
- *
- *           Issue: always returning (*this),
- *                  never passing the accumulate part through on return
- * */
 void lognum::MAC(lognum A, lognum B) {
     lognum mult = multiplyReals(A,B);
     (*this)=(addReals(*this,mult));
